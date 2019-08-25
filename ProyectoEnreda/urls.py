@@ -19,6 +19,8 @@ from AppEnreda import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.post_list, name='post_list'),
+
     path('',  views.CrudView.as_view(), name='crud_ajax'),
     path('create/',  views.CreateCrudUser.as_view(), name='crud_ajax_create'),
     path('update/',  views.UpdateCrudUser.as_view(), name='crud_ajax_update'),
