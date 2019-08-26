@@ -4,24 +4,26 @@
 {% block title %}Django Ajax CRUD{% endblock %}
 
 {% block content %}
-<div>
-    <h1>Django Ajax CRUD</h1>
-    <div >
+<div id="app">
+	<div id="container">
+    <h1>PRUEBA DE SELECCIÓN</h1>
+	<h2>Carlos Arcas Alcalá</h2>
+    
 	<!--FORMULARIO DE INSERCCIÓN DE DATOS-->
-		<div class="col-md-5 ">
-			<h3>ADD USER</h3>
+	<section id="containerForm">
+		<input type="button" id="btndlt" value="INSERTAR NOTA"  class="btn-info" onclick="mostrarForm()">
+		<div id="FormularioInput" class="col-md-8">
+			<button id="botonCerrar" type="button" class="btn btn-danger" onclick="cerrarForm()">X</button>
+			<h3 class="Titulo">INSERTAR NOTA</h3>
 			<form id="addUser" action="">
 			  <div class="form-group">
-				<span>NOMBRE</span><input class="form-control" type="text" name="name" placeholder="Name" value="DEFAULT" required>
+				<span>END_DATE</span><input class="form-control" type="date" name="end_date" required>
 			  </div>
 			  <div class="form-group">
-				<span>ADRESS</span><input class="form-control" type="text" name="address" placeholder="Address" value="DEFAULT_ADRESS" required>
+				<span>NOTE</span><textarea class="form-control" type="text" name="note" placeholder="Note" required></textarea>
 			  </div>
-			  <div class="form-group">
-				<span>AGE</span><input class="form-control" type="number" name="age" min="10" max="100" placeholder="Age" value="15" required>
-			  </div>
-			  <div class="form-group">
-				<span>NOTE</span><textarea class="form-control" type="text" name="note" placeholder="Note" required>Default Nota</textarea>
+			  <div  class="form-group">
+				<span>ADJUNTO</span><input id="adjunto" type="file" name="adjunto">
 			  </div>
 			  <div class="form-group">
 				<span>USER</span><select class="form-control" name="creador"   multiple>
@@ -30,9 +32,7 @@
 				{% endfor %}
 				</select>
 			  </div>
-			  <div class="form-group">
-				<span>END_DATE</span><input class="form-control" type="date" name="end_date" required>
-			  </div>
+			  
 			  <div class="form-group">
 				<span>TASK</span><select class="form-control" name="task">
 					<option value="YES">YES</option>
@@ -45,40 +45,37 @@
 			  <div class="form-group">
 				<span>TYPE</span><input class="form-control" type="text" name="type" required>
 			  </div>
-			  <button class="btn btn-primary form-control" type="submit">SUBMIT</button>
+			  <button class="btn btn-primary form-control" type="submit" onclick="cerrarForm()">SUBMIT</button>
 			</form>
 		</div>	
-	
+	</section>
 	<!--FIN FORMULARIO INSERCCIÓN DE DATOS -->
     <!--TABLA DE NOTE--> 
-      <div>
-        <h3>USERS</h3>
+      <div id="TablaOutput">
+        <div class="Titulo"><h3>NOTE</h3></div>
         <table id="userTable" class="table table-striped">
           <tr>
             <th>ID</th>
-            <th>NAME</th>
-            <th>ADRESS</th>
-            <th>AGE</th>
-			<th>NOTE</th>
-			<th>AUTOR</th>
-			<th>AUTOR2</th>		
 			<th>DATE</th>
 			<th>END_DATE</th>
+			<th>NOTE</th>
+			<th>ADJUNTO</th>
+			<th>USER</th>					
 			<th>TASK</th>
 			<th>TAG</th>
 			<th>TYPE</th>
-			<th>EDIT</th>
-			<th>DLT</th>
+			<th>EDITAR</th>
+			<th>BORRAR</th>
           </tr>
           {% if users %}
           {% for user in users %}
           <tr id="user-{{user.id}}">
 		      <td class="userId userData" name="id">{{user.id}}</td>
-              <td class="userName userData" name="name">{{user.name}}</td>
-              <td class="userAddress userData" name="address">{{user.address}}</td>
-              <td class="userAge userData" name="age">{{user.age}}</td>
+			  <td class="userDate userData" name="date">{{user.date}}</td>
+              <td class="userEnd_Date userData" name="end_date">{{user.end_date}}</td>
 			  <td class="userNote userData" name="note">{{user.note}}</td>
-			  <td class="userCreador2 userData" name="creador">
+			  <td class="userAdjunto userData" name="adjunto"></td>
+			  <td class="userCreador2 userData" name="creador" hidden>
 			  {% if user.creador.all|join:"|" %}
 				{{user.creador.all|join:"|"}}
 			  {% else %}
@@ -86,12 +83,9 @@
 			  {% endif %}
 			  </td>
 			  <td class="userCreador userData" name="creador2">{{user.creador2}}</td>
-              <td class="userDate userData" name="date">{{user.date}}</td>
-              <td class="userEnd_Date userData" name="end_date">{{user.end_date}}</td>
 			  <td class="userTask userData" name="task">{{user.task}}</td>
 			  <td class="userTag userData" name="tag">{{user.tag}}</td>
 			  <td class="userType userData" name="type">{{user.type}}</td>
-			 
 			  <td align="center">
                   <button class="btn btn-success form-control" onClick="editUser({{user.id}})" data-toggle="modal" data-target="#myModal")>EDIT</button>
               </td>
@@ -105,9 +99,8 @@
           {% endif %}
         </table>
       </div>
+	</div>
 	  <!--FIN TABLA DE NOTE-->
-    </div>
-</div>
   <!-- MODAL EMERGENTE DE EDICIÓN DE NOTE -->
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
@@ -118,29 +111,32 @@
         </div>
         <form id="updateUser" action="">
         <div class="modal-body">
-            <input class="form-control" id="form-id" type="hidden" name="formId"/>
-            <label for="name">Name</label>
-            <input class="form-control" id="form-name" type="text" name="formName"/>
-            <label for="address">Address</label>
-            <input class="form-control" id="form-address" type="text" name="formAddress"/>
-            <label for="age">Age</label>
-            <input class="form-control" id="form-age" type="number" name="formAge" min=10 max=100/>
+			<input class="form-control" id="form-id" type="hidden" name="formId"/>
+			
+			<label for="end_date">End_Date</label>
+			<input class="form-control" id="form-end_date" type="date" name="formEnd_Date" required>
+            
 			<label for="note">Note</label>
 			<textarea class="form-control" id="form-note" name="formNote"></textarea>
-			<label for="creador2">Creador2</label>
-			<input class="form-control" id="form-creador2" type="text" name="formCreador2"/>
-			<label for="end_date">End_Date</label>
-			<input class="form-control" id="form-end_date" type="date" name="formEnd_Date">
-			<label for="name">Tag</label>
-            <select class="form-control" id="form-tag" name="formTask">
+			
+			<label for="creador2">User</label>
+			<input class="form-control" id="form-creador2" type="text" name="formCreador2" />
+			
+			<label for="Adjunto">Adjunto</label>
+			<input class="form-control" id="form-adjunto" type="file" name="formAdjunto" />
+			
+			
+			<label for="name">Task</label>
+            <select class="form-control" id="form-task" name="formTask">
 				<option value="YES">YES</option>
 				<option value="NO">NO</option>
 			</select>
-			<label for="name">Task</label>
-            <input class="form-control" id="form-type" type="text" name="formTag"/>
+			
+			<label for="name">Tag</label>
+            <input class="form-control" id="form-tag" type="text" name="formTag" />
+			
 			<label for="name">Type</label>
-            <input class="form-control" id="form-name" type="text" name="formType"/>
-
+            <input class="form-control" id="form-type" type="text" name="formType" />
         </div>
         <div class="modal-footer">
             <button type="submit" class="btn btn-primary" >Save changes</button>
@@ -150,6 +146,7 @@
       </div>
     </div>
   </div>
+</div>
   <!--FIN MODAL EMERGENTE-->
 {% endblock %}
 {% block javascript %}
@@ -157,41 +154,35 @@
 // CREAR NOTE
 $("form#addUser").submit(function() {
 	//OBTIENE LOS VALORES DE LOS CAMPOS DEL FORMULARIO
-    var nameInput = $('input[name="name"]').val().trim();
-    var addressInput = $('input[name="address"]').val().trim();
-    var ageInput = $('input[name="age"]').val().trim();
 	var noteInput = $('textarea[name="note"]').val().trim();
 	var creadorInput = $('select[name="creador"]').val();
 	var end_dateInput = $('input[name="end_date"]').val().trim();
 	var taskInput = $('select[name="task"]').val();
+	var adjuntoInput= $('input[name="adjunto"]').val().trim();
 	var tagInput = $('input[name="tag"]').val().trim();
 	var typeInput = $('input[name="type"]').val().trim();
 
-	if (true) {
-        // LLAMA A CREATE
-        $.ajax({
-            url: '{% url "crud_ajax_create" %}',
-            data: {
-                'name': nameInput,
-                'address': addressInput,
-                'age': ageInput,
-				'note': noteInput,
-				'creador': creadorInput,
-				'end_date':end_dateInput,
-				'task':taskInput,
-				'tag':tagInput,
-				'type':typeInput,
-            },
-            dataType: 'json',
-            success: function (data) {
-                if (data.user) {
-                  appendToUsrTable(data.user); //LLAMA A LA FUNCION PARA ACTUALIZAR LA TABLA CON LOS DATOS CREADOS DESDE FORMULARIO
-                }
-            }
-        });
-      } else {
-        alert("All fields must have a valid value.");
-    }
+
+	// LLAMA A CREATE
+	$.ajax({
+		url: '{% url "crud_ajax_create" %}',
+		data: {
+			'note': noteInput,
+			'creador': creadorInput,
+			'end_date':end_dateInput,
+			'adjunto': adjuntoInput,
+			'task':taskInput,
+			'tag':tagInput,
+			'type':typeInput,
+		},
+		dataType: 'json',
+		success: function (data) {
+			if (data.user) {
+			  appendToUsrTable(data.user); //LLAMA A LA FUNCION PARA ACTUALIZAR LA TABLA CON LOS DATOS CREADOS DESDE FORMULARIO
+			}
+		}
+	});
+
     $('form#addUser').trigger("reset");
     return false;
 });
@@ -200,14 +191,13 @@ function appendToUsrTable(user) {
   $("#userTable > tbody:last-child").append(`
         <tr id="user-${user.id}">'
 			'<td class="useId" name="name">${user.id}</td>
-            '<td class="userName" name="name">${user.name}</td>
-            '<td class="userAddress" name="address">${user.address}</td>
-            '<td class="userAge" name="age">${user.age}</td>
-			'<td class="userNote" name="note">${user.note}</td>
-			'<td class="userCreador" name="creador">${user.creador2}</td>
-			'<td class="userCreador2" name="creador2">${user.creador2}</td>
 			'<td class="userDate" name="date">${user.date}</td>
 			'<td class="userEnd_Date" name="end_date">${user.end_date}</td>
+			'<td class="userNote" name="note">${user.note}</td>
+			'<td class="userAdjunto" name="adjunto"> </td>
+			'<td class="userCreador" name="creador" hidden>${user.creador2}</td>
+			'<td class="userCreador2" name="creador2">${user.creador2}</td>
+			
 			'<td class="userTask" name="task">${user.task}</td>
 			'<td class="userTag" name="tag">${user.tag}</td>
 			'<td class="userType" name="type">${user.type}</td>
@@ -224,41 +214,33 @@ function appendToUsrTable(user) {
 // ACTUALIZA EL REGISTRO
 $("form#updateUser").submit(function() {
     var idInput = $('input[name="formId"]').val().trim();
-    var nameInput = $('input[name="formName"]').val().trim();
-    var addressInput = $('input[name="formAddress"]').val().trim();
-    var ageInput = $('input[name="formAge"]').val().trim();
 	var noteInput = $('textarea[name="formNote"]').val().trim();
 	var creador2Input = $('input[name="formCreador2"]').val().trim();
 	var end_dateInput = $('input[name="formEnd_Date"]').val().trim();
 	var taskInput = $('select[name="formTask"]').val();
 	var tagInput = $('input[name="formTag"]').val().trim();
 	var typeInput = $('input[name="formType"]').val().trim();
-    if (true) {
-        // Create Ajax Call
-        $.ajax({
-            url: '{% url "crud_ajax_update" %}',
-            data: {
-                'id': idInput,
-                'name': nameInput,
-                'address': addressInput,
-                'age': ageInput,
-				'note': noteInput,
-				'creador2':creador2Input,
-				'end_date': end_dateInput,
-				'task':taskInput,
-				'tag':tagInput,
-				'type':typeInput,
-            },
-            dataType: 'json',
-            success: function (data) {
-                if (data.user) {
-                  updateToUserTabel(data.user);
-                }
-            }
-        });
-       } else {
-        alert("All fields must have a valid value.");
-    }
+
+	// AJAX
+	$.ajax({
+		url: '{% url "crud_ajax_update" %}',
+		data: {
+			'id': idInput,
+			'note': noteInput,
+			'creador2':creador2Input,
+			'end_date': end_dateInput,
+			'task':taskInput,
+			'tag':tagInput,
+			'type':typeInput,
+		},
+		dataType: 'json',
+		success: function (data) {
+			if (data.user) {
+			  updateToUserTabel(data.user);
+			}
+		}
+	});
+
     $('form#updateUser').trigger("reset");
     $('#myModal').modal('hide');
     return false;
@@ -268,9 +250,6 @@ $("form#updateUser").submit(function() {
 function editUser(id) {
   if (id) {
     tr_id = "#user-" + id;
-    name = $(tr_id).find(".userName").text();
-    address = $(tr_id).find(".userAddress").text();
-    age = $(tr_id).find(".userAge").text();
 	note = $(tr_id).find(".userNote").text();
 	creador2 = $(tr_id).find(".userCreador2").text().trim();
 	end_date = $(tr_id).find(".userEnd_Date").text();
@@ -278,9 +257,6 @@ function editUser(id) {
 	tag = $(tr_id).find(".userTag").text();
 	type = $(tr_id).find(".userType").text();
     $('#form-id').val(id);
-    $('#form-name').val(name);
-    $('#form-address').val(address);
-    $('#form-age').val(age);
 	$('#form-note').val(note);
 	$('#form-creador2').val(creador2);
 	$('#form-end_date').val(end_date);
@@ -292,12 +268,6 @@ function editUser(id) {
 function updateToUserTabel(user){
     $("#userTable #user-" + user.id).children(".userData").each(function() {
         var attr = $(this).attr("name");
-        if (attr == "name") {
-          $(this).text(user.name);
-        }
-		if (attr == "address") {
-          $(this).text(user.address);
-        }
 		if (attr == "creador2"){
 		  $(this).text(user.creador2);
 		}
@@ -307,9 +277,6 @@ function updateToUserTabel(user){
 		if (attr == "note"){
           $(this).text(user.note);
         }
-		if (attr == "age"){
-		  $(this).text(user.age);
-		}
 		if (attr == "end_date"){
 		  $(this).text(user.end_date);
 		}
@@ -328,7 +295,7 @@ function updateToUserTabel(user){
 
 // Delete Django Ajax Call
 function deleteUser(id) {
-  var action = confirm("Are you sure you want to delete this user?");
+  var action = confirm("¿Desea borrar este registro?");
   if (action != false) {
     $.ajax({
         url: '{% url "crud_ajax_delete" %}',
@@ -345,7 +312,17 @@ function deleteUser(id) {
   }
 }
 
+function mostrarForm()
+{
+	$( "#btndlt" ).css( "display","none" );
+	$( "#FormularioInput" ).css( "display","initial" );
 
+}
+function cerrarForm()
+{
+	$( "#btndlt" ).css( "display","initial" );
+	$( "#FormularioInput" ).css( "display","none" );
+}
 
 </script>
 {% endblock javascript %}
